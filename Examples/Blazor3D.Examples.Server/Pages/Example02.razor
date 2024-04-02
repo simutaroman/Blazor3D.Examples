@@ -21,6 +21,10 @@
     <div class="col-6">
         <p><button class="btn btn-primary" @onclick="OnLoadObjButtonClick">Load OBJ</button> </p>
         <p><button class="btn btn-primary" @onclick="OnLoadObjNoTexturesButtonClick">Load OBJ w/o texture</button> </p>
+        <p>
+            <input @bind="PathToLocalDisk" placeholder="Enter the full path to the file on your local drive" size="50" /><br/>
+            <button class="btn btn-primary" @onclick="OnLoadObjNoTexturesLocalFilesButtonClick">Load OBJ w/o texture local disk</button>
+        </p>
         <p><button class="btn btn-primary" @onclick="OnLoadColladaButtonClick">Load Collada</button> </p>
         <p><button class="btn btn-primary" @onclick="OnLoadFbxButtonClick">Load Fbx</button> </p>
         <p><button class="btn btn-primary" @onclick="OnLoadGltfButtonClick">Load Gltf</button> </p>
@@ -38,6 +42,7 @@
     private Scene scene = new Scene();
     private Guid loadedObjectGuid = Guid.NewGuid();
     private string msg = string.Empty;
+    private string PathToLocalDisk { get; set; }
 
     public void Dispose()
     {
@@ -51,7 +56,8 @@
         return base.OnInitializedAsync();
     }
 
-    private void AddLights(){
+    private void AddLights()
+    {
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
             {
@@ -117,6 +123,21 @@
         // Also you can get the uuid of object to be imported before its loaded completely
         loadedObjectGuid = await View3D1.Import3DModelAsync(settings);
         await View3D1.SetCameraPositionAsync(new Vector3(0, 100, 250), new Vector3(0, 50, 0));
+    }
+
+    private async Task OnLoadObjNoTexturesLocalFilesButtonClick()
+    {
+        var settings = new ImportSettings
+            {
+                Format = Import3DFormats.Obj,
+                //The path is processed without quotes
+                FileURL = $"api/File/FileDownload?link={PathToLocalDisk}"
+            };
+
+        loadedObjectGuid = await View3D1.Import3DModelAsync(settings);
+        await View3D1.SetCameraPositionAsync(
+            new Vector3(0, 100, 250),
+            new Vector3(0, 50, 0));
     }
 
     private async Task OnLoadColladaButtonClick()
